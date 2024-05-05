@@ -1,0 +1,19 @@
+target_precompile_headers(mod
+    PRIVATE
+        Pch.h
+)
+target_sources(mod
+    PRIVATE
+        version.rc
+        DllMain.cpp
+        Mod.cpp
+        bootstrap.cpp
+        CharacterSelectionManager.cpp
+        ObjSwitchCharacterVolume.cpp
+    PRIVATE FILE_SET HEADERS FILES
+        Pch.h
+        bootstrap.h
+        CharacterSelectionManager.h
+        ObjSwitchCharacterVolume.h
+        utilities/Helpers.h
+)

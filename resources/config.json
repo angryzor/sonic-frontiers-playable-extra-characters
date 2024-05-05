@@ -1,0 +1,27 @@
+{
+    "Groups": [{
+        "Name": "Main",
+        "DisplayName": "Options",
+        "Elements": [{
+            "Name": "IncludeDir0",
+            "DisplayName": "Cyberspace physics preset",
+            "Description": ["Choose which Cyberspace physics configuration to use for Amy, Tails and Knuckles."],
+            "Type": "PhysicsPreset",
+            "MinValue": null,
+            "MaxValue": null,
+            "DefaultValue": "physics-presets/weezley"
+        }]
+    }],
+    "Enums": {
+        "PhysicsPreset": [{
+            "DisplayName": "Weezley's Physics",
+            "Value": "physics-presets/weezley",
+            "Description": ["A physics preset made by Weezley! This preset mimicks Sonic's Cyberspace physics, with some small adjustments like improved wallclimbing for Knuckles."]
+        }, {
+            "DisplayName": "InvalidFile's Physics",
+            "Value": "physics-presets/invalidfile",
+            "Description": ["A physics preset made by InvalidFile! This preset mimicks Sonic's Cyberspace physics."]
+        }]
+    },
+    "IniFile": "Mod.ini"
+}
