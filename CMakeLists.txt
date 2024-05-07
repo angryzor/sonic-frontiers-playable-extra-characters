@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(playable-extra-characters VERSION 0.1.3
+project(playable-extra-characters VERSION 0.1.4
                  DESCRIPTION "Playable Amy, Tails and Knuckles"
                  LANGUAGES CXX)
 
