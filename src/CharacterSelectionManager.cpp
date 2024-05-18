@@ -23,6 +23,11 @@ const hh::game::GameServiceClass* CharacterSelectionManager::GetClass() {
 	return &gameServiceClass;
 }
 
+void* CharacterSelectionManager::GetRuntimeTypeInfo()
+{
+	return nullptr;
+}
+
 bool CharacterSelectionManager::ProcessMessage(hh::fnd::Message& message) {
 	switch (message.ID) {
 	case hh::fnd::MessageID::NOTIFY_LEVEL_STATUS: {
@@ -122,6 +127,36 @@ app::player::CharacterId CharacterSelectionManager::GetRespawnCharacter() const
 }
 
 void CharacterSelectionManager::PerformCharacterChange(CharacterId charId) {
+	CharacterIdU8 charIdU8 = static_cast<app::player::CharacterIdU8>(charId);
+
+	if (auto* levelInfo = pGameManager->GetService<app::level::LevelInfo>())
 	if (auto* gameMode = static_cast<app::MyApplication*>(app::MyApplication::GetInstance())->GetExtension<app::game::ApplicationSequenceExtension>()->GetCurrentGameMode())
-		GameModeStage_ChangePlayerCharacter(nullptr, gameMode, charId);
+	if (auto* fxParamMgr = pGameManager->GetService<app::gfx::FxParamManager>()) {
+		app::player::Player::Kill(pGameManager, 0);
+
+		pGameManager->ShutdownPendingObjects();
+
+		auto& stageConfig = fxParamMgr->sceneParameters[fxParamMgr->currentSceneParameters]->sceneData->stageConfig;
+		auto* playerInfo = levelInfo->GetPlayerInformation(0);
+
+		app::player::Player::PlayerSetupInfo setupInfo{};
+		setupInfo.playerId = 0;
+		setupInfo.characterId = charIdU8;
+		setupInfo.worldPos.m_Position = playerInfo->position.value;
+		setupInfo.worldPos.m_Rotation = playerInfo->rotation.value;
+		setupInfo.deadline = stageConfig.common.deadline;
+		setupInfo.deadFallTime = stageConfig.common.deadFallTime;
+		setupInfo.oceanSurface = stageConfig.common.oceanSurface;
+		setupInfo.unk6 = 1;
+		setupInfo.startType = app::player::Player::StartType::STAND;
+
+		app::player::Player::Spawn(pGameManager, setupInfo);
+
+		app::ui::MsgUIChangePlayerCharacter msgUIChangePlayerCharacter{ charIdU8 };
+		msgUIChangePlayerCharacter.Mask = 0x4000000;
+		app::ut::SendMessageToUIObjects(*gameMode, pGameManager, msgUIChangePlayerCharacter);
+
+		app::player::MsgAddNotifyPreDeadListener msgAddNotifyPreDeadListener{};
+		app::ut::SendMessageToPlayerObject(*gameMode, pGameManager, 0, msgAddNotifyPreDeadListener);
+	}
 }

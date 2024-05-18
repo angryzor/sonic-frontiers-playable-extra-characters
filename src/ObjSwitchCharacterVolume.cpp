@@ -113,7 +113,7 @@ const RflClassMember::Value gameObjectClassAttributes[]{
 	{ "category", RflClassMember::Type::TYPE_CSTRING, "Common/System" },
 };
 
-const GameObjectClass ObjSwitchCharacterVolume::staticGameObjectClass{
+const GameObjectClass ObjSwitchCharacterVolume::gameObjectClass{
 	"SwitchCharacterVolume",
 	"SwitchCharacterVolume",
 	sizeof(ObjSwitchCharacterVolume),
@@ -249,5 +249,5 @@ void ObjSwitchCharacterVolume::EventCallback(unsigned int event)
 
 const hh::game::GameObjectClass* ObjSwitchCharacterVolume::GetClass()
 {
-	return &staticGameObjectClass;
+	return &gameObjectClass;
 }

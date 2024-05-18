@@ -11,6 +11,7 @@ class CharacterSelectionManager : public hh::game::GameService, public hh::game:
 	static app::level::StageData::AttributeFlags GetCharacterAttributeFlag(app::player::CharacterId charId);
 
 public:
+	virtual void* GetRuntimeTypeInfo() override;
 	virtual bool ProcessMessage(hh::fnd::Message& message) override;
 	virtual void OnAddedToGame() override;
 	virtual void OnRemovedFromGame() override;
