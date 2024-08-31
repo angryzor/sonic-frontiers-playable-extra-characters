@@ -31,11 +31,10 @@ class KeyEventHandler : public hh::fw::KeyEventHandler, public hh::game::GameMan
 		if (keyEventArgs.scanCode >= 0x1e && keyEventArgs.scanCode <= 0x21) {
 			if (auto* gameManager = hh::game::GameManager::GetInstance()) {
 				if (auto* levelInfo = gameManager->GetService<LevelInfo>()) {
-					if (auto* charSelMgr = gameManager->GetService<CharacterSelectionManager>()) {
-						auto charId = static_cast<CharacterId>(keyEventArgs.scanCode - 0x1e);
+					auto charId = static_cast<CharacterId>(keyEventArgs.scanCode - 0x1e);
+					MsgChangeStartingCharacter msg{ charId, keyEventArgs.modifier == 1 };
 
-						charSelMgr->ChangeStartingCharacter(charId, keyEventArgs.modifier == 1);
-					}
+					gameManager->SendMessage(msg);
 				}
 			}
 		}

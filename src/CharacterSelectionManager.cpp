@@ -5,6 +5,9 @@ using namespace app::level;
 
 auto GameModeStage_ChangePlayerCharacter = reinterpret_cast<void (*)(void* fsm, app::game::GameMode * gamemode, app::player::CharacterId charId)>(0x1401F0A60ui64);
 
+MsgChangeStartingCharacter::MsgChangeStartingCharacter(app::player::CharacterId charId, bool force) : app::fnd::AppMessageCustom<MsgChangeStartingCharacter>{ MSG_CHANGE_STARTING_CHARACTER }, charId{ charId }, force{ force } {}
+MsgChangeCurrentCharacter::MsgChangeCurrentCharacter(app::player::CharacterId charId) : app::fnd::AppMessageCustom<MsgChangeCurrentCharacter>{ MSG_CHANGE_CURRENT_CHARACTER }, charId{ charId } {}
+
 CharacterSelectionManager::CharacterSelectionManager(csl::fnd::IAllocator* allocator) : GameService{ allocator } {
 
 }
@@ -62,6 +65,16 @@ void CharacterSelectionManager::MessageProcessedCallback(hh::game::GameManager* 
 			if (auto* playerInfo = levelInfo->GetPlayerInformation(0))
 				currentCharacter = static_cast<CharacterId>(playerInfo->characterId.value);
 		break;
+	case MSG_CHANGE_STARTING_CHARACTER: {
+		auto& msg = static_cast<const MsgChangeStartingCharacter&>(message);
+		ChangeStartingCharacter(msg.charId, msg.force);
+		break;
+	}
+	case MSG_CHANGE_CURRENT_CHARACTER: {
+		auto& msg = static_cast<const MsgChangeCurrentCharacter&>(message);
+		ChangeCurrentCharacter(msg.charId);
+		break;
+	}
 	}
 }
 

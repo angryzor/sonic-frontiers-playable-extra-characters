@@ -6,10 +6,10 @@ using namespace hh::game;
 using namespace app::game;
 
 const RflClassEnumMember characterIdMembers[]{
-	{ 0, "Sonic", u8"ソニック", 0 },
-	{ 1, "Amy", u8"エミー", 0 },
-	{ 2, "Knuckles", u8"ナックルズ", 0 },
-	{ 3, "Tails", u8"テイルス", 0 },
+	{ 0, "Sonic", reinterpret_cast<const char*>(u8"ソニック"), 0ull },
+	{ 1, "Amy", reinterpret_cast<const char*>(u8"エミー"), 0ull },
+	{ 2, "Knuckles", reinterpret_cast<const char*>(u8"ナックルズ"), 0ull },
+	{ 3, "Tails", reinterpret_cast<const char*>(u8"テイルス"), 0ull },
 };
 
 const RflClassEnumMember conditionMembers[]{
@@ -60,7 +60,7 @@ const RflClassMember spawnerMembers[]{
 	{ "lifetime", nullptr, nullptr, RflClassMember::TYPE_FLOAT, RflClassMember::TYPE_VOID, 0, 0, offsetof(ObjSwitchCharacterVolumeSpawner, lifetime), &lifetimeAttributes },
 	{ "eventDriven", nullptr, nullptr, RflClassMember::TYPE_BOOL, RflClassMember::TYPE_VOID, 0, 0, offsetof(ObjSwitchCharacterVolumeSpawner, eventDriven), &eventDrivenAttributes },
 	{ "characterId", nullptr, &spawnerEnums[0], RflClassMember::TYPE_ENUM, RflClassMember::TYPE_UINT32, 0, 0, offsetof(ObjSwitchCharacterVolumeSpawner, characterId), &characterIdAttributes },
-	{ "volume", rangerssdk::GetAddress(&app::rfl::VolumeTriggerSpawner::rflClass), nullptr, RflClassMember::TYPE_STRUCT, RflClassMember::TYPE_VOID, 0, 0, offsetof(ObjSwitchCharacterVolumeSpawner, volume), &volumeAttributes },
+	{ "volume", rangerssdk::GetAddress(&heur::rfl::VolumeTriggerSpawner::rflClass), nullptr, RflClassMember::TYPE_STRUCT, RflClassMember::TYPE_VOID, 0, 0, offsetof(ObjSwitchCharacterVolumeSpawner, volume), &volumeAttributes },
 };
 
 const RflClass ObjSwitchCharacterVolumeSpawner::rflClass{
@@ -81,9 +81,9 @@ void* constructObjSwitchCharacterVolumeSpawner(void* instance, csl::fnd::IAlloca
 	self->condition = ObjSwitchCharacterVolumeSpawner::Condition::COND_ON_TRIGGER;
 	self->lifetime = 0.0;
 	self->eventDriven = 0;
-	self->volume.ShapeType = app::rfl::VolumeTriggerSpawner::Shape::SHAPE_BOX;
-	self->volume.basePoint = app::rfl::VolumeTriggerSpawner::BasePoint::BASE_CENTER;
-	self->volume.CollisionFilter = app::rfl::VolumeTriggerSpawner::ColliFilter::FILTER_DEFAULT;
+	self->volume.ShapeType = heur::rfl::VolumeTriggerSpawner::Shape::SHAPE_BOX;
+	self->volume.basePoint = heur::rfl::VolumeTriggerSpawner::BasePoint::BASE_CENTER;
+	self->volume.CollisionFilter = heur::rfl::VolumeTriggerSpawner::ColliFilter::FILTER_DEFAULT;
 	self->volume.CollisionWidth = 1.0;
 	self->volume.CollisionHeight = 1.0;
 	self->volume.CollisionDepth = 1.0;
@@ -235,9 +235,11 @@ void ObjSwitchCharacterVolume::EventCallback(unsigned int event)
 
 			if (auto* player = static_cast<GameObject*>(MessageManager::GetInstance()->GetMessengerByHandle(hPlayer)))
 				if (auto* playerParam = player->GetComponent<app::player::GOCPlayerParameter>())
-					if (playerParam->characterId != characterId)
-						if (auto* charSelMgr = gameManager->GetService<CharacterSelectionManager>())
-							charSelMgr->ChangeCurrentCharacter(characterId);
+					if (playerParam->characterId != characterId) {
+						MsgChangeCurrentCharacter msg{ characterId };
+
+						SendMessageToGame(msg);
+					}
 		}
 		break;
 	}
