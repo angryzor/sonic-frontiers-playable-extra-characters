@@ -6,18 +6,18 @@ using namespace hh::game;
 using namespace app::game;
 
 const RflClassEnumMember characterIdMembers[]{
-	{ 0, "Sonic", reinterpret_cast<const char*>(u8"ソニック"), 0ull },
-	{ 1, "Amy", reinterpret_cast<const char*>(u8"エミー"), 0ull },
-	{ 2, "Knuckles", reinterpret_cast<const char*>(u8"ナックルズ"), 0ull },
-	{ 3, "Tails", reinterpret_cast<const char*>(u8"テイルス"), 0ull },
+	{ 0, "Sonic", reinterpret_cast<const char*>(u8"ソニック") },
+	{ 1, "Amy", reinterpret_cast<const char*>(u8"エミー") },
+	{ 2, "Knuckles", reinterpret_cast<const char*>(u8"ナックルズ") },
+	{ 3, "Tails", reinterpret_cast<const char*>(u8"テイルス") },
 };
 
 const RflClassEnumMember conditionMembers[]{
-	{ 0, "COND_ON_TRIGGER", "COND_ON_TRIGGER", 0 },
-	{ 1, "COND_PULSE", "COND_PULSE", 0 },
-	{ 2, "COND_TIMER_ONCE", "COND_TIMER_ONCE", 0 },
-	{ 3, "COND_TIMER", "COND_TIMER", 0 },
-	{ 4, "COND_ON_STAY", "COND_ON_STAY", 0 },
+	{ 0, "COND_ON_TRIGGER", "COND_ON_TRIGGER" },
+	{ 1, "COND_PULSE", "COND_PULSE" },
+	{ 2, "COND_TIMER_ONCE", "COND_TIMER_ONCE" },
+	{ 3, "COND_TIMER", "COND_TIMER" },
+	{ 4, "COND_ON_STAY", "COND_ON_STAY" },
 };
 
 const RflClassEnum spawnerEnums[]{
@@ -56,11 +56,11 @@ const RflCustomAttribute volumeAttributes_[]{
 const RflCustomAttributes volumeAttributes{ volumeAttributes_, sizeof(volumeAttributes_) / sizeof(RflCustomAttribute) };
 
 const RflClassMember spawnerMembers[]{
-	{ "condition", nullptr, &spawnerEnums[1], RflClassMember::TYPE_ENUM, RflClassMember::TYPE_SINT8, 0, 0, offsetof(ObjSwitchCharacterVolumeSpawner, condition), &conditionAttributes },
-	{ "lifetime", nullptr, nullptr, RflClassMember::TYPE_FLOAT, RflClassMember::TYPE_VOID, 0, 0, offsetof(ObjSwitchCharacterVolumeSpawner, lifetime), &lifetimeAttributes },
-	{ "eventDriven", nullptr, nullptr, RflClassMember::TYPE_BOOL, RflClassMember::TYPE_VOID, 0, 0, offsetof(ObjSwitchCharacterVolumeSpawner, eventDriven), &eventDrivenAttributes },
-	{ "characterId", nullptr, &spawnerEnums[0], RflClassMember::TYPE_ENUM, RflClassMember::TYPE_UINT32, 0, 0, offsetof(ObjSwitchCharacterVolumeSpawner, characterId), &characterIdAttributes },
-	{ "volume", rangerssdk::GetAddress(&heur::rfl::VolumeTriggerSpawner::rflClass), nullptr, RflClassMember::TYPE_STRUCT, RflClassMember::TYPE_VOID, 0, 0, offsetof(ObjSwitchCharacterVolumeSpawner, volume), &volumeAttributes },
+	{ "condition", nullptr, &spawnerEnums[1], RflClassMember::Type::ENUM, RflClassMember::Type::SINT8, 0, 0, offsetof(ObjSwitchCharacterVolumeSpawner, condition), &conditionAttributes },
+	{ "lifetime", nullptr, nullptr, RflClassMember::Type::FLOAT, RflClassMember::Type::VOID, 0, 0, offsetof(ObjSwitchCharacterVolumeSpawner, lifetime), &lifetimeAttributes },
+	{ "eventDriven", nullptr, nullptr, RflClassMember::Type::BOOL, RflClassMember::Type::VOID, 0, 0, offsetof(ObjSwitchCharacterVolumeSpawner, eventDriven), &eventDrivenAttributes },
+	{ "characterId", nullptr, &spawnerEnums[0], RflClassMember::Type::ENUM, RflClassMember::Type::UINT32, 0, 0, offsetof(ObjSwitchCharacterVolumeSpawner, characterId), &characterIdAttributes },
+	{ "volume", rangerssdk::GetAddress(&heur::rfl::VolumeTriggerSpawner::rflClass), nullptr, RflClassMember::Type::STRUCT, RflClassMember::Type::VOID, 0, 0, offsetof(ObjSwitchCharacterVolumeSpawner, volume), &volumeAttributes },
 };
 
 const RflClass ObjSwitchCharacterVolumeSpawner::rflClass{
@@ -110,7 +110,7 @@ const RflTypeInfo ObjSwitchCharacterVolumeSpawner::rflTypeInfo{
 };
 
 const RflClassMember::Value gameObjectClassAttributes[]{
-	{ "category", RflClassMember::Type::TYPE_CSTRING, "Common/System" },
+	{ "category", RflClassMember::Type::CSTRING, "Common/System" },
 };
 
 const GameObjectClass ObjSwitchCharacterVolume::gameObjectClass{
@@ -231,9 +231,9 @@ void ObjSwitchCharacterVolume::EventCallback(unsigned int event)
 		auto characterId = GetWorldDataByClass<ObjSwitchCharacterVolumeSpawner>()->characterId;
 
 		if (auto* levelInfo = gameManager->GetService<app::level::LevelInfo>()) {
-			Handle<Messenger> hPlayer = levelInfo->GetPlayerInformation(0)->playerObject.value;
+			Handle<app::player::Player> hPlayer = levelInfo->GetPlayerInformation(0)->playerObject.value;
 
-			if (auto* player = static_cast<GameObject*>(MessageManager::GetInstance()->GetMessengerByHandle(hPlayer)))
+			if (auto* player = static_cast<GameObject*>(MessageManager::GetInstance()->GetMessengerByHandle((Handle<hh::fnd::Messenger>&)hPlayer)))
 				if (auto* playerParam = player->GetComponent<app::player::GOCPlayerParameter>())
 					if (playerParam->characterId != characterId) {
 						MsgChangeCurrentCharacter msg{ characterId };

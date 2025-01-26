@@ -6,7 +6,7 @@ using namespace app::player;
 using namespace app::level;
 
 
-HOOK(Player::PlayerSetupInfo*, __fastcall, Player_PlayerSetupInfo_PlayerSetupInfo, 0x14A9CC3A0, Player::PlayerSetupInfo* self)
+HOOK(Player::PlayerSetupInfo*, __fastcall, Player_PlayerSetupInfo_PlayerSetupInfo, 0x140883EA0, Player::PlayerSetupInfo* self)
 {
 	auto* result = originalPlayer_PlayerSetupInfo_PlayerSetupInfo(self);
 
@@ -17,7 +17,7 @@ HOOK(Player::PlayerSetupInfo*, __fastcall, Player_PlayerSetupInfo_PlayerSetupInf
 	return result;
 }
 
-HOOK(void, __fastcall, GameModeCyberStage_RebuildLevelState_OnEnter, 0x147463820, void* self, void* unk1, unsigned int prevState) {
+HOOK(void, __fastcall, GameModeCyberStage_RebuildLevelState_OnEnter, 0x1401B6AC0, void* self, void* unk1, unsigned int prevState) {
 	if (prevState == 14)
 		if (auto* gameManager = hh::game::GameManager::GetInstance())
 			if (auto* charMgr = gameManager->GetService<CharacterSelectionManager>())

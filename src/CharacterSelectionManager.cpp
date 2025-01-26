@@ -49,19 +49,19 @@ bool CharacterSelectionManager::ProcessMessage(hh::fnd::Message& message) {
 
 void CharacterSelectionManager::OnAddedToGame()
 {
-	pGameManager->AddListener(this);
+	gameManager->AddListener(this);
 }
 
 void CharacterSelectionManager::OnRemovedFromGame()
 {
-	pGameManager->RemoveListener(this);
+	gameManager->RemoveListener(this);
 }
 
 void CharacterSelectionManager::MessageProcessedCallback(hh::game::GameManager* gameManager, const hh::fnd::Message& message)
 {
 	switch (message.ID) {
 	case hh::fnd::MessageID::PASS_POINT_MARKER:
-		if (auto* levelInfo = pGameManager->GetService<LevelInfo>())
+		if (auto* levelInfo = gameManager->GetService<LevelInfo>())
 			if (auto* playerInfo = levelInfo->GetPlayerInformation(0))
 				currentCharacter = static_cast<CharacterId>(playerInfo->characterId.value);
 		break;
@@ -90,7 +90,7 @@ StageData::AttributeFlags CharacterSelectionManager::GetCharacterAttributeFlag(C
 }
 
 bool CharacterSelectionManager::IsCharacterAllowed(CharacterId charId) const {
-	if (auto* levelInfo = pGameManager->GetService<LevelInfo>())
+	if (auto* levelInfo = gameManager->GetService<LevelInfo>())
 		return levelInfo->stageData->attributeFlags.test(GetCharacterAttributeFlag(charId));
 
 	return charId == CharacterId::SONIC;
@@ -100,7 +100,7 @@ void CharacterSelectionManager::ForceCharacterOn(CharacterId charId) const {
 	app::game::StageObjectModule::CharacterFilter filter = static_cast<app::game::StageObjectModule::CharacterFilter>(1 << static_cast<uint8_t>(charId));
 	app::game::StageObjectModule::LoadCharacterObjInfo(hh::game::GameManager::GetInstance(), &filter, hh::fnd::MemoryRouter::GetModuleAllocator());
 
-	if (auto* levelInfo = pGameManager->GetService<LevelInfo>())
+	if (auto* levelInfo = gameManager->GetService<LevelInfo>())
 		levelInfo->stageData->attributeFlags.set(GetCharacterAttributeFlag(charId));
 }
 
@@ -142,12 +142,12 @@ app::player::CharacterId CharacterSelectionManager::GetRespawnCharacter() const
 void CharacterSelectionManager::PerformCharacterChange(CharacterId charId) {
 	CharacterIdU8 charIdU8 = static_cast<app::player::CharacterIdU8>(charId);
 
-	if (auto* levelInfo = pGameManager->GetService<app::level::LevelInfo>())
+	if (auto* levelInfo = gameManager->GetService<app::level::LevelInfo>())
 	if (auto* gameMode = static_cast<app::MyApplication*>(app::MyApplication::GetInstance())->GetExtension<app::game::ApplicationSequenceExtension>()->GetCurrentGameMode())
-	if (auto* fxParamMgr = pGameManager->GetService<app::gfx::FxParamManager>()) {
-		app::player::Player::Kill(pGameManager, 0);
+	if (auto* fxParamMgr = gameManager->GetService<app::gfx::FxParamManager>()) {
+		app::player::Player::Kill(gameManager, 0);
 
-		pGameManager->ShutdownPendingObjects();
+		gameManager->ShutdownPendingObjects();
 
 		auto& stageConfig = fxParamMgr->sceneParameters[fxParamMgr->currentSceneParameters]->sceneData->stageConfig;
 		auto* playerInfo = levelInfo->GetPlayerInformation(0);
@@ -163,13 +163,13 @@ void CharacterSelectionManager::PerformCharacterChange(CharacterId charId) {
 		setupInfo.unk6 = 1;
 		setupInfo.startType = app::player::Player::StartType::STAND;
 
-		app::player::Player::Spawn(pGameManager, setupInfo);
+		app::player::Player::Spawn(gameManager, setupInfo);
 
 		app::ui::MsgUIChangePlayerCharacter msgUIChangePlayerCharacter{ charIdU8 };
 		msgUIChangePlayerCharacter.Mask = 0x4000000;
-		app::ut::SendMessageToUIObjects(*gameMode, pGameManager, msgUIChangePlayerCharacter);
+		app::ut::SendMessageToUIObjects(*gameMode, gameManager, msgUIChangePlayerCharacter);
 
 		app::player::MsgAddNotifyPreDeadListener msgAddNotifyPreDeadListener{};
-		app::ut::SendMessageToPlayerObject(*gameMode, pGameManager, 0, msgAddNotifyPreDeadListener);
+		app::ut::SendMessageToPlayerObject(*gameMode, gameManager, 0, msgAddNotifyPreDeadListener);
 	}
 }
